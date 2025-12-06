@@ -1,12 +1,15 @@
 import type { errorResponse } from "@/shared/types";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { auth } from "./lib/auth";
 
 const app = new Hono();
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
+app
+  .on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw))
+  .get("/", (c) => {
+    return c.text("Hello Hono!");
+  });
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
