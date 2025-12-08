@@ -9,6 +9,7 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
+  trustedOrigins: ["http://localhost:3000"],
   socialProviders: {
     google: {
       clientId: process.env["GOOGLE_CLIENT_ID"]!,
@@ -19,6 +20,7 @@ export const auth = betterAuth({
       clientSecret: process.env["GITHUB_CLIENT_SECRET"]!,
     },
   },
+
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
@@ -77,6 +79,9 @@ export const auth = betterAuth({
         max: 3,
       },
     },
+  },
+  advanced: {
+    useSecureCookies: false,
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {

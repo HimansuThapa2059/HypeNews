@@ -1,44 +1,31 @@
-import type { errorResponse } from "@/shared/types";
 import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import { auth } from "./lib/auth";
+import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
+import routes from "./routes";
+import { cors } from "hono/cors";
+import { attachUser } from "./middlewares/attachUser";
 
 const app = new Hono();
 
-app
-  .on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw))
-  .get("/", (c) => {
-    return c.text("Hello Hono!");
-  });
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
-app.onError((err, c) => {
-  if (err instanceof HTTPException) {
-    const errResponse =
-      err.res ??
-      c.json<errorResponse>(
-        {
-          success: false,
-          error: err.message,
-          isFormError:
-            err.cause && typeof err.cause === "object" && "form" in err.cause
-              ? err.cause.form === true
-              : false,
-        },
-        err.status
-      );
-    return errResponse;
-  }
+// ---- Attach User To Hono Context ----
+app.use(attachUser);
 
-  return c.json<errorResponse>(
-    {
-      success: false,
-      error:
-        process.env.NODE_ENV === "production"
-          ? "Internal Server Error"
-          : (err.stack ?? err.message),
-    },
-    500
-  );
-});
+// ---- routes ----
+app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+
+app.route("/", routes);
+
+// ---- Middlewares ----
+app.notFound(notFoundHandler);
+app.onError(errorHandler);
 
 export default app;
