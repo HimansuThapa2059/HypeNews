@@ -1,7 +1,9 @@
 import {
   createCommentForPost,
   createPostService,
+  getCommentsService,
   getPaginatedPostsService,
+  getSpecificPostService,
   upvotePostService,
 } from "@/service/post.service";
 import {
@@ -122,6 +124,67 @@ export const createComment = async (c: Context) => {
       message: "Comment created",
       data: comment,
     });
+  } catch (error) {
+    if (error instanceof HTTPException) {
+      throw error;
+    }
+    throw new HTTPException(500, { message: "Internal server error" });
+  }
+};
+
+export const getComments = async (c: Context) => {
+  try {
+    const user = c.get("user");
+    const { postId } = c.req.valid("param");
+    const { limit, page, sortBy, order, includeChildren } =
+      c.req.valid("query");
+
+    const { comments, count } = await getCommentsService({
+      limit,
+      page,
+      order,
+      sortBy,
+      user,
+      includeChildren,
+      postId,
+    });
+
+    return c.json<PaginatedResponse<Comment[]>>(
+      {
+        success: true,
+        message: "Comments fetched",
+        data: comments as Comment[],
+        pagination: {
+          page,
+          totalPages: Math.ceil(count / limit) as number,
+        },
+      },
+      200
+    );
+  } catch (error) {
+    if (error instanceof HTTPException) {
+      throw error;
+    }
+    throw new HTTPException(500, { message: "Internal server error" });
+  }
+};
+
+export const getSpecificPost = async (c: Context) => {
+  try {
+    const user = c.get("user");
+
+    const { postId } = c.req.valid("param");
+
+    const post = await getSpecificPostService({ user, postId });
+
+    return c.json<SuccessResponse<Post>>(
+      {
+        success: true,
+        message: "Post Fetched successfully",
+        data: post as Post,
+      },
+      200
+    );
   } catch (error) {
     if (error instanceof HTTPException) {
       throw error;

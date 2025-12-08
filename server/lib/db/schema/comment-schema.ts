@@ -35,10 +35,11 @@ export const commentRelations = relations(commentsTable, ({ one, many }) => ({
   parentComment: one(commentsTable, {
     fields: [commentsTable.parentCommentId],
     references: [commentsTable.id],
-    relationName: "childComments",
+    relationName: "commentRelation",
   }),
+
   childComments: many(commentsTable, {
-    relationName: "parentComment",
+    relationName: "commentRelation",
   }),
 
   post: one(postsTable, {
@@ -46,7 +47,9 @@ export const commentRelations = relations(commentsTable, ({ one, many }) => ({
     references: [postsTable.id],
   }),
 
-  commentUpvotes: many(commentUpvotesTable, { relationName: "commentUpvotes" }),
+  commentUpvotes: many(commentUpvotesTable, {
+    relationName: "commentUpvotes",
+  }),
 }));
 
 export const insertCommentsSchema = createInsertSchema(commentsTable, {

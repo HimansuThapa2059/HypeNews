@@ -59,8 +59,8 @@ export type Post = {
   commentCount: number;
   author: {
     id: string;
-    username: string;
-  };
+    name: string;
+  } | null;
   isUpvoted: boolean;
 };
 
@@ -90,6 +90,6 @@ export type Comment = {
   author: {
     username: string;
     id: string;
-  };
+  } | null;
   childComments?: Comment[];
 };

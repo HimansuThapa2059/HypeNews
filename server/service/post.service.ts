@@ -2,11 +2,14 @@ import { db } from "@/lib/db/db";
 import { user as userTable } from "@/lib/db/schema/auth-schema";
 import { commentsTable } from "@/lib/db/schema/comment-schema";
 import { postsTable } from "@/lib/db/schema/post-schema";
-import { postUpvotesTable } from "@/lib/db/schema/upvote-schema";
+import {
+  commentUpvotesTable,
+  postUpvotesTable,
+} from "@/lib/db/schema/upvote-schema";
 import { toIsoTimestampSql } from "@/lib/utils";
 import type { Comment, paginationType } from "@/shared/types";
 import type { User } from "better-auth";
-import { and, asc, countDistinct, desc, eq, sql } from "drizzle-orm";
+import { and, asc, countDistinct, desc, eq, isNull, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 interface createPostServiceInput {
@@ -29,7 +32,7 @@ export const createPostService = async ({
   return post;
 };
 
-type PaginatedServiceInput = paginationType & {
+type PaginatedPostsServiceInput = paginationType & {
   user: User;
 };
 export const getPaginatedPostsService = async ({
@@ -40,7 +43,7 @@ export const getPaginatedPostsService = async ({
   author,
   site,
   user,
-}: PaginatedServiceInput) => {
+}: PaginatedPostsServiceInput) => {
   const offset = (page - 1) * limit;
 
   const sortByColumn =
@@ -153,15 +156,6 @@ export const upvotePostService = async ({
   return { count: points, isUpvoted: pointsChange > 0 };
 };
 
-// Custom Error Classes (for better error handling in Express)
-export class PostNotFoundError extends Error {
-  constructor(message: string = "Post not found") {
-    super(message);
-    this.name = "PostNotFoundError";
-    Object.setPrototypeOf(this, PostNotFoundError.prototype);
-  }
-}
-
 export class CommentCreationError extends Error {
   constructor(message: string = "Failed to create comment") {
     super(message);
@@ -170,20 +164,11 @@ export class CommentCreationError extends Error {
   }
 }
 
-/**
- * Creates a new comment for a specified post.
- * @param postId The ID of the post.
- * @param content The content of the comment.
- * @param user The authenticated user object.
- * @returns The newly created comment with enriched author data.
- * @throws {PostNotFoundError} If the post does not exist.
- * @throws {CommentCreationError} If the comment insertion fails.
- */
-export async function createCommentForPost(
+export const createCommentForPost = async (
   postId: number,
   content: string,
   user: User
-): Promise<Comment> {
+): Promise<Comment> => {
   const newlyCreatedComment = await db.transaction(async (tx) => {
     const [updatedPost] = await tx
       .update(postsTable)
@@ -230,4 +215,149 @@ export async function createCommentForPost(
       id: user.id,
     },
   } as Comment;
+};
+
+type getCommentsServiceInput = paginationType & {
+  user: User;
+  includeChildren?: boolean;
+  postId: number;
+};
+export const getCommentsService = async ({
+  includeChildren = false,
+  limit,
+  order,
+  page,
+  sortBy,
+  user,
+  postId,
+}: getCommentsServiceInput) => {
+  const offset = (page - 1) * limit;
+
+  const [postExists] = await db
+    .select({ exists: sql`1` })
+    .from(postsTable)
+    .where(eq(postsTable.id, postId))
+    .limit(1);
+
+  if (!postExists) {
+    throw new HTTPException(404, { message: "Post not found" });
+  }
+
+  const sortByColumn =
+    sortBy === "points" ? commentsTable.points : commentsTable.createdAt;
+
+  const sortOrder = order === "desc" ? desc(sortByColumn) : asc(sortByColumn);
+
+  const [count] = await db
+    .select({ count: countDistinct(commentsTable.id) })
+    .from(commentsTable)
+    .where(
+      and(
+        eq(commentsTable.postId, postId),
+        isNull(commentsTable.parentCommentId)
+      )
+    );
+
+  const totalCount = count?.count ?? 0;
+
+  const comments = await db.query.commentsTable.findMany({
+    where: and(
+      eq(commentsTable.postId, postId),
+      isNull(commentsTable.parentCommentId)
+    ),
+    orderBy: sortOrder,
+    limit: limit,
+    offset: offset,
+    with: {
+      author: {
+        columns: {
+          name: true,
+          id: true,
+        },
+      },
+      commentUpvotes: {
+        columns: { userId: true },
+        where: eq(commentUpvotesTable.userId, user?.id ?? ""),
+        limit: 1,
+      },
+      childComments: {
+        limit: includeChildren ? 2 : 0,
+        with: {
+          author: {
+            columns: {
+              name: true,
+              id: true,
+            },
+          },
+          commentUpvotes: {
+            columns: { userId: true },
+            where: eq(commentUpvotesTable.userId, user?.id ?? ""),
+            limit: 1,
+          },
+        },
+        orderBy: sortOrder,
+        extras: {
+          createdAt: toIsoTimestampSql(commentsTable.createdAt).as(
+            "created_at"
+          ),
+        },
+      },
+    },
+    extras: {
+      createdAt: toIsoTimestampSql(commentsTable.createdAt).as("created_at"),
+    },
+  });
+
+  const typesafeComments = comments as Comment[];
+  return {
+    comments: typesafeComments,
+    count: totalCount,
+  };
+};
+
+interface getSpecificPostServiceInput {
+  user: User | null;
+  postId: number;
 }
+export const getSpecificPostService = async ({
+  postId,
+  user,
+}: getSpecificPostServiceInput) => {
+  const postsQuery = db
+    .select({
+      id: postsTable.id,
+      title: postsTable.title,
+      url: postsTable.url,
+      points: postsTable.points,
+      content: postsTable.content,
+      createdAt: toIsoTimestampSql(postsTable.createdAt),
+      commentCount: postsTable.commentCount,
+      author: {
+        username: userTable.name,
+        id: userTable.id,
+      },
+      isUpvoted: user
+        ? sql<boolean>`CASE WHEN ${postUpvotesTable.userId} IS NOT NULL THEN true ELSE false END`
+        : sql<boolean>`false`,
+    })
+    .from(postsTable)
+    .leftJoin(userTable, eq(postsTable.userId, userTable.id))
+    .where(eq(postsTable.id, postId));
+
+  if (user) {
+    postsQuery.leftJoin(
+      postUpvotesTable,
+      and(
+        eq(postUpvotesTable.postId, postsTable.id),
+        eq(postUpvotesTable.userId, user.id)
+      )
+    );
+  }
+
+  const [post] = await postsQuery;
+  if (!post) {
+    throw new HTTPException(404, { message: "Post not found" });
+  }
+
+  return post;
+};

@@ -3,6 +3,8 @@ import {
   getPaginatedPosts,
   upvotePosts,
   createComment,
+  getComments,
+  getSpecificPost,
 } from "@/controllers";
 import { requireAuth } from "@/middlewares/requireAuth";
 import {
@@ -35,6 +37,27 @@ postRouter
     ),
     zValidator("form", createCommentSchema),
     createComment
+  )
+  .get(
+    "/:postId/comments",
+    zValidator(
+      "param",
+      z.object({
+        postId: z.coerce.number(),
+      })
+    ),
+    zValidator(
+      "query",
+      paginationSchema.extend({
+        includeChildren: z.coerce.boolean().optional(),
+      })
+    ),
+    getComments
+  )
+  .get(
+    "/:postId",
+    zValidator("param", z.object({ postId: z.coerce.number() })),
+    getSpecificPost
   );
 
 export default postRouter;
