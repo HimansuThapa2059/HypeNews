@@ -5,7 +5,7 @@ import {
   getPaginatedPostsService,
   getSpecificPostService,
   upvotePostService,
-} from "@/service/post.service";
+} from "@/service";
 import {
   type Comment,
   type PaginatedResponse,
@@ -108,15 +108,14 @@ export const upvotePosts = async (c: Context) => {
 };
 
 export const createComment = async (c: Context) => {
-  const user = c.get("user")!;
-  if (!user || !user.id) {
-    throw new HTTPException(401, { message: "Unauthorized" });
-  }
-
-  const { postId } = c.req.valid("param");
-  const { content } = c.req.valid("form");
-
   try {
+    const user = c.get("user")!;
+    if (!user || !user.id) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    const { postId } = c.req.valid("param");
+    const { content } = c.req.valid("form");
     const comment = await createCommentForPost(postId, content, user);
 
     return c.json<SuccessResponse<Comment>>({
