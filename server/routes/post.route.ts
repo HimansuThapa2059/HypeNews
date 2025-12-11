@@ -16,9 +16,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z from "zod";
 
-const postRouter = new Hono();
-
-postRouter
+const postRouter = new Hono()
   .post("/", requireAuth, zValidator("form", createPostSchema), createPost)
   .get("/", zValidator("query", paginationSchema), getPaginatedPosts)
   .post(
@@ -29,23 +27,13 @@ postRouter
   )
   .post(
     "/:postId/comment",
-    zValidator(
-      "param",
-      z.object({
-        postId: z.coerce.number(),
-      })
-    ),
+    zValidator("param", z.object({ postId: z.coerce.number() })),
     zValidator("form", createCommentSchema),
     createComment
   )
   .get(
     "/:postId/comments",
-    zValidator(
-      "param",
-      z.object({
-        postId: z.coerce.number(),
-      })
-    ),
+    zValidator("param", z.object({ postId: z.coerce.number() })),
     zValidator(
       "query",
       paginationSchema.extend({
@@ -61,3 +49,4 @@ postRouter
   );
 
 export default postRouter;
+export type PostRoutes = typeof postRouter;

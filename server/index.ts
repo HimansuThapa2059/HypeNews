@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { auth } from "./lib/auth";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
 import routes from "./routes";
 import { cors } from "hono/cors";
@@ -20,8 +19,6 @@ app.use(
 app.use(attachUser);
 
 // ---- routes ----
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
 app.route("/", routes);
 
 // ---- Middlewares ----

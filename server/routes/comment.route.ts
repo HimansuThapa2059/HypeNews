@@ -9,9 +9,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z from "zod";
 
-const commentRouter = new Hono();
-
-commentRouter
+const commentRouter = new Hono()
   .post(
     "/:commentId",
     requireAuth,
@@ -33,3 +31,4 @@ commentRouter
   );
 
 export default commentRouter;
+export type CommentRoutes = typeof commentRouter;

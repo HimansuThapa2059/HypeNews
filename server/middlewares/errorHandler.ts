@@ -1,4 +1,4 @@
-import type { errorResponse } from "@/shared/types";
+import type { ErrorResponse } from "@/shared/types";
 import type { Context, NotFoundHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
 
@@ -23,7 +23,7 @@ export function errorHandler(err: unknown, c: Context) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (err.cause as any).form === true;
 
-    return c.json<errorResponse>(
+    return c.json<ErrorResponse>(
       {
         success: false,
         error: err.message,
@@ -39,5 +39,5 @@ export function errorHandler(err: unknown, c: Context) {
       : // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ((err as any).stack ?? String(err));
 
-  return c.json<errorResponse>({ success: false, error: message }, 500);
+  return c.json<ErrorResponse>({ success: false, error: message }, 500);
 }
