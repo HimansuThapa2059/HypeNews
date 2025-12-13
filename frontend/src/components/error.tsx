@@ -12,6 +12,7 @@ import {
 } from "./ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Button } from "./ui/button";
+import { defaultHomeSearchParams } from "@/routes";
 
 export function ErrorComponent({ error }: { error: Error }) {
   const router = useRouter();
@@ -44,7 +45,9 @@ export function ErrorComponent({ error }: { error: Error }) {
             Try again
           </Button>
           <Button asChild className="w-full" variant="outline">
-            <Link to="/">Return to homepage</Link>
+            <Link to="/" search={defaultHomeSearchParams}>
+              Return to homepage
+            </Link>
           </Button>
           {isDev ? (
             <Accordion type="single" collapsible className="w-full">

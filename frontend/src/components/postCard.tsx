@@ -15,7 +15,7 @@ export const PostCard = ({
   loading = false,
 }: {
   post?: Post;
-  onUpvote?: (id: number) => void;
+  onUpvote?: (postId: number) => void;
   loading?: boolean;
 }) => {
   const user = useSession().data?.user;
@@ -46,7 +46,6 @@ export const PostCard = ({
     );
   }
 
-  console.log(post);
   if (!post) return null;
 
   return (
@@ -56,7 +55,7 @@ export const PostCard = ({
           onClick={() => onUpvote?.(post.id)}
           disabled={!user}
           className={cn(
-            "w-10 flex flex-col items-center justify-center text-muted-foreground hover:text-primary",
+            "w-10 flex flex-col items-center justify-center text-muted-foreground hover:text-primary cursor-pointer",
             post.isUpvoted && "text-primary",
             !user && "opacity-50 cursor-not-allowed"
           )}

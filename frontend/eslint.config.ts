@@ -47,6 +47,11 @@ export default defineConfig([
 
   // Custom rules & settings
   {
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
     rules: {
       "react/no-unknown-property": "off",
       "react/react-in-jsx-scope": "off",

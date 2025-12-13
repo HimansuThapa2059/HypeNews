@@ -10,6 +10,7 @@ import {
 import z from "zod";
 import { PostCard } from "@/components/postCard";
 import { Button } from "@/components/ui/button";
+import { useUpvotePost } from "@/lib/api-hooks";
 
 type GetPostsReturnType = Awaited<ReturnType<typeof getPosts>>;
 
@@ -59,6 +60,7 @@ const postsInfiniteQueryOptions = ({
 
 function HomeComponent() {
   const { sortBy, order, author, site } = Route.useSearch();
+  const upvoteMutation = useUpvotePost();
 
   return (
     <div className="mx-auto w-full">
@@ -78,13 +80,20 @@ function HomeComponent() {
           order={order}
           author={author}
           site={site}
+          upvoteMutation={upvoteMutation}
         />
       </Suspense>
     </div>
   );
 }
 
-function HomeContent({ sortBy, order, author, site }: HomeSearchParams) {
+function HomeContent({
+  sortBy,
+  order,
+  author,
+  site,
+  upvoteMutation,
+}: HomeSearchParams & { upvoteMutation: ReturnType<typeof useUpvotePost> }) {
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery(
       postsInfiniteQueryOptions({ sortBy, order, author, site })
@@ -94,11 +103,17 @@ function HomeContent({ sortBy, order, author, site }: HomeSearchParams) {
     <>
       <div className="space-y-4 mt-4">
         {data.pages.map((page) =>
-          page.data.map((post) => <PostCard key={post.id} post={post} />)
+          page.data.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onUpvote={() => upvoteMutation.mutate(post.id.toString())}
+            />
+          ))
         )}
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 text-center">
         <Button
           onClick={() => fetchNextPage()}
           disabled={!hasNextPage || isFetchingNextPage}

@@ -44,3 +44,17 @@ export const getPosts = async ({
   const data = (await res.json()) as PaginatedResponse<Post[]>;
   return data;
 };
+
+export const upvotePost = async (postId: string) => {
+  const res = await client.posts[":postId"].upvote.$post({
+    param: {
+      postId,
+    },
+  });
+  if (!res.ok) {
+    const data = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(data.error);
+  }
+  const data = await res.json();
+  return data;
+};
