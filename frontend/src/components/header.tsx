@@ -14,6 +14,7 @@ import { authClient, useSession } from "@/lib/auth";
 import { toast } from "sonner";
 import { formatName } from "@/utils/utils";
 import { defaultHomeSearchParams } from "@/routes";
+import Logo from "./logos/logo";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -48,9 +49,11 @@ const Header = () => {
           <Link
             to="/"
             search={defaultHomeSearchParams}
-            className="text-xl sm:text-2xl font-bold"
+            className="text-xl sm:text-2xl font-bold flex items-center gap-x-1"
           >
-            HypeNews
+            <Logo className="size-7" />
+
+            <span>HypeNews</span>
           </Link>
           <nav className="hidden items-center space-x-4 md:flex ml-5 tracking-wide font-medium">
             <Link

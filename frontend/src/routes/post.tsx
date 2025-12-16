@@ -4,8 +4,8 @@ import z from "zod";
 
 const postSearchSchema = z.object({
   id: z.number().default(0),
-  sortBy: sortBySchema.default("points"),
-  order: orderSchema.default("desc"),
+  sortBy: sortBySchema.optional().default("points"),
+  order: orderSchema.optional().default("desc"),
 });
 
 export type PostSearchParams = z.infer<typeof postSearchSchema>;

@@ -1,5 +1,4 @@
 import { insertCommentsSchema } from "../server/lib/db/schema/comment-schema";
-import { insertPostSchema } from "../server/lib/db/schema/post-schema";
 
 import z from "zod";
 
@@ -16,16 +15,34 @@ export type ErrorResponse = {
   isFormError?: boolean;
 };
 
-export const createPostSchema = insertPostSchema
-  .pick({
-    url: true,
-    title: true,
-    content: true,
+export const createPostSchema = z
+  .object({
+    title: z
+      .string({ error: "Please enter a title" })
+      .min(3, { error: "Title should be at least 3 characters" }),
+    url: z.string().refine((v) => v === "" || z.url().safeParse(v).success, {
+      message: "Please enter a valid URL",
+    }),
+    content: z.string(),
   })
-  .refine((data) => data.url || data.content, {
-    error: "A post must have either a URL or content",
-    path: ["url", "content"],
+  .superRefine((data, ctx) => {
+    const hasUrl = data.url.trim() !== "";
+    const hasContent = data.content.trim() !== "";
+
+    if (hasUrl === hasContent) {
+      ctx.addIssue({
+        path: ["url"],
+        message: "You must provide either a URL or content, but not both",
+        code: "custom",
+      });
+      ctx.addIssue({
+        path: ["content"],
+        message: "You must provide either a URL or content, but not both",
+        code: "custom",
+      });
+    }
   });
+
 export type createPostSchemaType = z.infer<typeof createPostSchema>;
 
 export const sortBySchema = z.enum(["points", "recent"]);

@@ -18,12 +18,12 @@ function RootComponent() {
 
   return (
     <>
-      <div className="flex min-h-screen flex-col text-foreground">
+      <div className="flex min-h-dvh flex-col text-foreground">
         {!isAuthPage && <Header />}
 
         <main
-          className={`grow container mx-auto ${
-            isAuthPage ? "flex items-center justify-center" : "p-4"
+          className={`grow container mx-auto p-4 ${
+            isAuthPage ? "flex items-center justify-center" : ""
           }`}
         >
           <Outlet />
