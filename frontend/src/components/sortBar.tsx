@@ -30,7 +30,7 @@ export function SortBar({ sortBy, order }: { sortBy: SortBy; order: Order }) {
           })
         }
       >
-        <SelectTrigger className="w-[180px] bg-background">
+        <SelectTrigger className="w-[180px] bg-background cursor-pointer">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -50,6 +50,7 @@ export function SortBar({ sortBy, order }: { sortBy: SortBy; order: Order }) {
             }),
           });
         }}
+        className="cursor-pointer"
         aria-label={order === "asc" ? "Sort Descending" : "Sort Ascending"}
       >
         <ArrowUpIcon

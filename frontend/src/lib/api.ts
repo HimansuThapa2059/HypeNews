@@ -6,6 +6,8 @@ import type {
   SortBy,
   PaginatedResponse,
   Post,
+  SuccessResponse,
+  Comment,
 } from "@/shared/types";
 
 const client = hc<ApiRoutes>("/", {
@@ -37,6 +39,7 @@ export const getPosts = async ({
       site: pagination.site,
     },
   });
+
   if (!res.ok) {
     const data = (await res.json()) as unknown as ErrorResponse;
     throw new Error(data.error);
@@ -84,5 +87,77 @@ export const createPost = async (
       error: String(e),
       isFormError: false,
     } as ErrorResponse;
+  }
+};
+
+export const getPost = async (postId: number) => {
+  const res = await client.posts[":postId"].$get({
+    param: {
+      postId: postId.toString(),
+    },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return data as SuccessResponse<Post>;
+  } else {
+    // if (res.status === 404) {
+    //   throw notFound();
+    // }
+    const data = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(data.error);
+  }
+};
+
+export async function getComments(
+  postId: number,
+  page: number = 1,
+  limit: number = 10,
+  pagination: {
+    sortBy?: SortBy;
+    order?: Order;
+  }
+) {
+  const res = await client.posts[":postId"].comments.$get({
+    param: {
+      postId: postId.toString(),
+    },
+    query: {
+      page: page.toString(),
+      limit: limit.toString(),
+      includeChildren: "true",
+      sortBy: pagination.sortBy,
+      order: pagination.order,
+    },
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    return data as PaginatedResponse<Comment[]>;
+  } else {
+    const data = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(data.error);
+  }
+}
+
+export const getCommentComments = async (
+  commentId: number,
+  page: number = 1,
+  limit: number = 2
+) => {
+  const res = await client.comments[":commentId"].comments.$get({
+    param: {
+      commentId: commentId.toString(),
+    },
+    query: {
+      page: page.toString(),
+      limit: limit.toString(),
+    },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return data as PaginatedResponse<Comment[]>;
+  } else {
+    const data = (await res.json()) as unknown as ErrorResponse;
+    throw new Error(data.error);
   }
 };

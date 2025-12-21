@@ -7,7 +7,7 @@ import { Link } from "@tanstack/react-router";
 import { defaultHomeSearchParams } from "@/routes";
 import { badgeVariants } from "./ui/badge";
 import { getHostname, relativeTime } from "@/utils/utils";
-import { defaultPostSearchParams } from "@/routes/post";
+import { defaultPostSearchParams } from "@/routes/posts.$postId";
 
 export const PostCard = ({
   post,
@@ -67,22 +67,14 @@ export const PostCard = ({
         <div className="flex flex-col flex-1">
           <div className="mb-1 flex flex-wrap items-center gap-x-2">
             <CardTitle className="text-lg font-semibold leading-tight">
-              {post.url ? (
-                <a
-                  href={post.url}
-                  className="hover:underline hover:text-primary"
-                >
-                  {post.title}
-                </a>
-              ) : (
-                <Link
-                  to="/"
-                  search={defaultHomeSearchParams}
-                  className="hover:underline hover:text-primary"
-                >
-                  {post.title}
-                </Link>
-              )}
+              <Link
+                to="/posts/$postId"
+                params={{ postId: post.id }}
+                search={defaultPostSearchParams}
+                className="hover:underline hover:text-primary"
+              >
+                {post.title}
+              </Link>
             </CardTitle>
 
             {post.url && (
@@ -115,15 +107,16 @@ export const PostCard = ({
                     author: post.author?.id || "",
                   }}
                 >
-                  {post.author?.username || "k ho"}
+                  {post.author?.name || "deleted user"}
                 </Link>
               </span>
               <span>·</span>
               <span>{relativeTime(post.createdAt)}</span>
               <span>·</span>
               <Link
-                to="/post"
-                search={{ ...defaultPostSearchParams, id: post.id }}
+                to="/posts/$postId"
+                params={{ postId: post.id }}
+                search={defaultPostSearchParams}
                 className="hover:underline"
               >
                 {post.commentCount} comments

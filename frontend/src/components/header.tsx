@@ -44,7 +44,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 bg-primary backdrop-blur supports-backdrop-filter:bg-primary/90">
-      <div className="container mx-auto flex items-center justify-between p-2.5 sm:p-4">
+      <div className="max-container flex items-center justify-between p-2.5 sm:p-4 md:px-6">
         <div className="flex items-center space-x-4">
           <Link
             to="/"

@@ -21,6 +21,7 @@ import {
 } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { defaultPostSearchParams } from "../posts.$postId";
 
 export const Route = createFileRoute("/_protected/create-post")({
   component: RouteComponent,
@@ -48,8 +49,9 @@ function RouteComponent() {
         await queryClient.invalidateQueries({ queryKey: ["posts"] });
         router.invalidate();
         await navigate({
-          to: "/post",
-          search: { id: res.data.postId, order: "desc", sortBy: "points" },
+          to: "/posts/$postId",
+          params: { postId: res.data.postId },
+          search: defaultPostSearchParams,
         });
         return;
       }
@@ -66,7 +68,7 @@ function RouteComponent() {
     },
   });
 
-  //TODO: stop navigating page while in middle of the post creation page
+  //TODO: prevent navigating to other pages while in middle of the post creation page
 
   return (
     <div className="mx-auto w-full max-w-2xl sm:mt-8 md:mt-12">

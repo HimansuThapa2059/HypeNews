@@ -31,7 +31,7 @@ export const replayComment = async (c: Context) => {
       childComments: [],
       commentUpvotes: [],
       author: {
-        username: user.username,
+        name: user.username,
         id: user.id,
       },
     } as Comment,

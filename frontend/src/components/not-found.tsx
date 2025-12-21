@@ -4,16 +4,19 @@ import { defaultHomeSearchParams } from "@/routes";
 
 export function NotFound() {
   return (
-    <div className="flex size-full items-center justify-center p-2 text-2xl">
-      <div className="flex flex-col items-center gap-4">
-        <p className="text-4xl font-bold">404</p>
-        <p className="text-lg">Page not found</p>
-        <Button asChild>
-          <Link to="/" search={defaultHomeSearchParams}>
-            Go Home
-          </Link>
-        </Button>
-      </div>
+    <div className="flex mt-20 flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 text-center">
+      <p className="text-7xl font-extrabold text-primary mb-4">404</p>
+      <p className="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
+        Oops! Page not found.
+      </p>
+      <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md">
+        The page you&apos;re looking for doesn&apos;t exist or has been moved.
+      </p>
+      <Button asChild variant="brand" size="lg">
+        <Link to="/" search={defaultHomeSearchParams}>
+          Go Back Home
+        </Link>
+      </Button>
     </div>
   );
 }

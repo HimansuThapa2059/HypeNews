@@ -22,7 +22,7 @@ function RootComponent() {
         {!isAuthPage && <Header />}
 
         <main
-          className={`grow container mx-auto p-4 ${
+          className={`max-container grow p-4 md:px-6${
             isAuthPage ? "flex items-center justify-center" : ""
           }`}
         >

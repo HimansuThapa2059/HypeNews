@@ -117,6 +117,7 @@ function HomeContent({
         <Button
           onClick={() => fetchNextPage()}
           disabled={!hasNextPage || isFetchingNextPage}
+          className="cursor-pointer"
         >
           {isFetchingNextPage
             ? "Loading more..."

@@ -119,6 +119,10 @@
   }
 }
 
+.max-container {
+  @apply w-full max-w-7xl mx-auto;
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;

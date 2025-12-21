@@ -72,7 +72,7 @@ export const getPaginatedPostsService = async ({
       commentCount: postsTable.commentCount,
       content: postsTable.content,
       author: {
-        username: userTable.name,
+        name: userTable.name,
         id: userTable.id,
       },
       isUpvoted: user
@@ -211,7 +211,7 @@ export const createCommentForPost = async (
     commentUpvotes: [],
     childComments: [],
     author: {
-      username: user.name,
+      name: user.name,
       id: user.id,
     },
   } as Comment;
@@ -333,7 +333,7 @@ export const getSpecificPostService = async ({
       createdAt: toIsoTimestampSql(postsTable.createdAt),
       commentCount: postsTable.commentCount,
       author: {
-        username: userTable.name,
+        name: userTable.name,
         id: userTable.id,
       },
       isUpvoted: user
