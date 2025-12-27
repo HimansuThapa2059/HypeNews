@@ -9,7 +9,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import { upvoteComment, upvotePost } from "./api";
+import { postComment, upvoteComment, upvotePost } from "./api";
 import { current, produce } from "immer";
 import { toast } from "sonner";
 
@@ -182,6 +182,91 @@ export const useUpvoteComment = () => {
           queryClient.setQueryData(queryKey, oldData);
         });
       }
+    },
+  });
+};
+
+export const useCreateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      content,
+      isParent,
+    }: {
+      id: number;
+      content: string;
+      isParent: boolean;
+    }) => postComment(id, content, isParent),
+    onMutate: async ({ id, content, isParent }) => {
+      const commentQueryKey = isParent
+        ? ["comments", "comment", id]
+        : ["comments", "post", id];
+
+      let prevData;
+      const user = queryClient.getQueryData<string | null>(["user"]);
+      queryClient.setQueriesData<InfiniteData<PaginatedResponse<Comment[]>>>(
+        { queryKey: commentQueryKey },
+        produce((oldData) => {
+          prevData = current(oldData);
+          if (!oldData) {
+            return undefined;
+          }
+
+          const draftComment: Comment = {
+            content,
+            points: 0,
+            depth: 0,
+            createdAt: new Date().toISOString(),
+            postId: id,
+            author: {
+              name: user ?? "",
+              id: "",
+            },
+            id: -1,
+            userId: "",
+            parentCommentId: null,
+            commentUpvotes: [],
+            commentCount: 0,
+          };
+
+          if (oldData.pages.length > 0) {
+            oldData.pages[0].data.unshift(draftComment);
+          }
+        })
+      );
+      return { prevData };
+    },
+    onSuccess: (data, { id, isParent }) => {
+      const queryKey = isParent
+        ? ["comments", "comment", id]
+        : ["comments", "post", id];
+
+      if (data.success) {
+        queryClient.invalidateQueries({ queryKey: ["post", data.data.postId] });
+        queryClient.setQueriesData<InfiniteData<PaginatedResponse<Comment[]>>>(
+          { queryKey },
+          produce((oldData) => {
+            if (!oldData) {
+              return undefined;
+            }
+            if (oldData?.pages.length > 0) {
+              oldData.pages[0].data = [
+                data.data,
+                ...oldData.pages[0].data.filter((c) => c.id !== -1),
+              ];
+            }
+          })
+        );
+      }
+    },
+    onError: (err, { id, isParent }) => {
+      console.error(err);
+      const queryKey = isParent
+        ? ["comments", "comment", id]
+        : ["comments", "post", id];
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 };

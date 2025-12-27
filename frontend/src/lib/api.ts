@@ -55,7 +55,7 @@ export const upvotePost = async (postId: string) => {
     },
   });
   if (!res.ok) {
-    const data = (await res.json()) as unknown as ErrorResponse;
+    const data = (await res.json()) as ErrorResponse;
     throw new Error(data.error);
   }
   const data = await res.json();
@@ -79,7 +79,7 @@ export const createPost = async (
       const data = await res.json();
       return data;
     }
-    const data = (await res.json()) as unknown as ErrorResponse;
+    const data = (await res.json()) as ErrorResponse;
     return data;
   } catch (e) {
     return {
@@ -104,7 +104,7 @@ export const getPost = async (postId: number) => {
     // if (res.status === 404) {
     //   throw notFound();
     // }
-    const data = (await res.json()) as unknown as ErrorResponse;
+    const data = (await res.json()) as ErrorResponse;
     throw new Error(data.error);
   }
 };
@@ -135,7 +135,7 @@ export async function getComments(
     const data = await res.json();
     return data as PaginatedResponse<Comment[]>;
   } else {
-    const data = (await res.json()) as unknown as ErrorResponse;
+    const data = (await res.json()) as ErrorResponse;
     throw new Error(data.error);
   }
 }
@@ -158,12 +158,12 @@ export const getCommentComments = async (
     const data = await res.json();
     return data as PaginatedResponse<Comment[]>;
   } else {
-    const data = (await res.json()) as unknown as ErrorResponse;
+    const data = (await res.json()) as ErrorResponse;
     throw new Error(data.error);
   }
 };
 
-export async function upvoteComment(commentId: string) {
+export const upvoteComment = async (commentId: string) => {
   // await new Promise((r) => setTimeout(r, 3000));
   // throw new Error("error");
   const res = await client.comments[":commentId"].upvote.$post({
@@ -175,6 +175,44 @@ export async function upvoteComment(commentId: string) {
   if (res.ok) {
     return await res.json();
   }
-  const data = (await res.json()) as unknown as ErrorResponse;
+  const data = (await res.json()) as ErrorResponse;
   throw Error(data.error);
-}
+};
+
+export const postComment = async (
+  id: number,
+  content: string,
+  isNested?: boolean
+) => {
+  try {
+    const res = isNested
+      ? await client.comments[":commentId"].$post({
+          form: {
+            content,
+          },
+          param: {
+            commentId: id.toString(),
+          },
+        })
+      : await client.posts[":postId"].comment.$post({
+          form: {
+            content,
+          },
+          param: {
+            postId: id.toString(),
+          },
+        });
+
+    if (res.ok) {
+      return await res.json();
+    }
+    const data = (await res.json()) as ErrorResponse;
+    return data;
+  } catch (e) {
+    return {
+      success: false,
+      error: String(e),
+      isFormError: false,
+    } as ErrorResponse;
+  }
+};

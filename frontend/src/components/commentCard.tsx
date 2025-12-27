@@ -19,6 +19,7 @@ import { Link } from "@tanstack/react-router";
 import { defaultHomeSearchParams } from "@/routes";
 import { Separator } from "./ui/separator";
 import { useUpvoteComment } from "@/lib/api-hooks";
+import { CommentForm } from "./commentForm";
 
 type GetCommentCommentsReturnType = Awaited<
   ReturnType<typeof getCommentComments>
@@ -75,6 +76,7 @@ export function CommentCard({
         },
       ],
     },
+
     getNextPageParam: (
       lastPage: GetCommentCommentsReturnType,
       _,
@@ -90,8 +92,15 @@ export function CommentCard({
   const loadFirstPage =
     comments?.pages[0].data?.length === 0 && comment.commentCount > 0;
 
+  const isDraft = comment.id === -1;
+
   return (
-    <div className={cn(depth > 0 && "ml-4 border-l border-border pl-4")}>
+    <div
+      className={cn(
+        depth > 0 && "ml-4 border-l border-border pl-4",
+        isDraft && "pointer-events-none opacity-50"
+      )}
+    >
       <div className="py-2">
         <div className="mb-2 flex items-center space-x-1 text-xs">
           <button
@@ -150,7 +159,16 @@ export function CommentCard({
                 </button>
               )}
             </div>
-            {isReplying && <div className="mt-2">comment form</div>}
+            {isReplying && (
+              <div className="mt-2.5">
+                <CommentForm
+                  id={comment.id}
+                  isParent
+                  key={comment.id}
+                  onSuccess={() => setActiveReplyId(null)}
+                />
+              </div>
+            )}
           </>
         )}
       </div>

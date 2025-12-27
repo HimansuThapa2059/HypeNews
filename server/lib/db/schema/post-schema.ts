@@ -37,7 +37,9 @@ export const postRelations = relations(postsTable, ({ one, many }) => ({
 }));
 
 export const insertPostSchema = createInsertSchema(postsTable, {
-  title: z.string().min(3, { message: "Title must be atleast 3 chars" }),
+  title: z
+    .string()
+    .min(3, { message: "Title must be atleast 3 characters long" }),
   url: z.url({ message: "URL must be a valid URL" }).or(z.literal("")),
   content: z.string().or(z.literal("")),
 });

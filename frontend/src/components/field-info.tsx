@@ -5,5 +5,5 @@ interface FieldInfoProps {
 export function FieldInfo({ message }: FieldInfoProps) {
   if (!message) return null;
 
-  return <p className="text-sm font-medium text-destructive">{message}</p>;
+  return <p className="text-sm font-medium text-destructive/80">{message}</p>;
 }

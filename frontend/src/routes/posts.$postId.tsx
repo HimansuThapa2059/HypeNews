@@ -1,9 +1,11 @@
 import { CommentCard } from "@/components/commentCard";
+import { CommentForm } from "@/components/commentForm";
 import { PostCard } from "@/components/postCard";
 import { SortBar } from "@/components/sortBar";
 import { Card, CardContent } from "@/components/ui/card";
 import { getComments, getPost } from "@/lib/api";
 import { useUpvoteComment, useUpvotePost } from "@/lib/api-hooks";
+import { useSession } from "@/lib/auth";
 import { orderSchema, sortBySchema } from "@/shared/types";
 import {
   infiniteQueryOptions,
@@ -42,17 +44,13 @@ const commentsInfiniteQueryOptions = ({
   order,
 }: z.infer<typeof postSearchSchema> & { postId: number }) =>
   infiniteQueryOptions({
-    queryKey: ["comments", postId, sortBy, order],
+    queryKey: ["comments", "post", postId, sortBy, order],
     queryFn: ({ pageParam }) =>
       getComments(postId, pageParam, 10, { sortBy, order }),
     initialPageParam: 1,
     staleTime: Infinity,
     retry: false,
-    getNextPageParam: (
-      lastPage: GetPostsReturnType,
-      allPages,
-      lastPageParam
-    ) => {
+    getNextPageParam: (lastPage: GetPostsReturnType, _, lastPageParam) => {
       if (lastPage.pagination.totalPages <= lastPageParam) {
         return undefined;
       }
@@ -76,6 +74,9 @@ export const Route = createFileRoute("/posts/$postId")({
 function RouteComponent() {
   const { order, sortBy } = Route.useSearch();
   const [activeReplayId, setActiveReplayId] = useState<number | null>(null);
+
+  const session = useSession();
+  const user = session.data?.user;
 
   const { postId } = Route.useParams();
   if (!Number.isInteger(postId)) {
@@ -105,11 +106,18 @@ function RouteComponent() {
         )}
       </div>
 
-      <div className="my-2">
+      <div className="my-4">
         {comments && comments.pages[0].data.length > 0 && (
           <h2 className="mb-2 text-lg font-semibold text-foreground pl-1.5">
             Comments
           </h2>
+        )}
+        {user && (
+          <Card className="mb-4 py-4">
+            <CardContent>
+              <CommentForm id={postId} />
+            </CardContent>
+          </Card>
         )}
         {comments && comments.pages[0].data.length > 0 && (
           <SortBar sortBy={sortBy} order={order} />
