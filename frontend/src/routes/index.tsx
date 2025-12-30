@@ -11,6 +11,8 @@ import z from "zod";
 import { PostCard } from "@/components/postCard";
 import { Button } from "@/components/ui/button";
 import { useUpvotePost } from "@/lib/api-hooks";
+import { useSession } from "@/lib/auth";
+import { SubmitFab } from "@/components/floatingCreateButton";
 
 type GetPostsReturnType = Awaited<ReturnType<typeof getPosts>>;
 
@@ -35,6 +37,17 @@ export const defaultHomeSearchParams: HomeSearchParams = homeSearchSchema.parse(
 export const Route = createFileRoute("/")({
   component: HomeComponent,
   validateSearch: (s) => homeSearchSchema.parse(s),
+  loaderDeps: ({ search }) => ({
+    sortBy: search.sortBy,
+    order: search.order,
+    author: search.author,
+    site: search.site,
+  }),
+  loader: ({ context, deps: { sortBy, order, author, site } }) => {
+    context.queryClient.ensureInfiniteQueryData(
+      postsInfiniteQueryOptions({ sortBy, order, author, site })
+    );
+  },
 });
 
 const postsInfiniteQueryOptions = ({
@@ -62,6 +75,8 @@ function HomeComponent() {
   const { sortBy, order, author, site } = Route.useSearch();
   const upvoteMutation = useUpvotePost();
 
+  const user = useSession().data?.user;
+
   return (
     <div className="mx-auto w-full">
       <SortBar sortBy={sortBy} order={order} />
@@ -83,6 +98,8 @@ function HomeComponent() {
           upvoteMutation={upvoteMutation}
         />
       </Suspense>
+
+      {user && <SubmitFab />}
     </div>
   );
 }
@@ -118,6 +135,7 @@ function HomeContent({
           onClick={() => fetchNextPage()}
           disabled={!hasNextPage || isFetchingNextPage}
           className="cursor-pointer"
+          variant="brand"
         >
           {isFetchingNextPage
             ? "Loading more..."

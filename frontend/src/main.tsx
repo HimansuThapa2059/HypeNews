@@ -9,6 +9,7 @@ import { ErrorComponent } from "./components/error";
 import { Toaster } from "./components/ui/sonner";
 
 const queryClient = new QueryClient();
+
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",

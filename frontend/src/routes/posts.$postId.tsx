@@ -69,6 +69,24 @@ export const Route = createFileRoute("/posts/$postId")({
         : { postId: NaN };
     },
   },
+  loaderDeps: ({ search: { sortBy, order } }) => ({
+    sortBy,
+    order,
+  }),
+
+  loader: async ({ params: { postId }, deps: { sortBy, order }, context }) => {
+    const id = Number(postId);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error("invalid postId");
+    }
+
+    await Promise.all([
+      context.queryClient.ensureQueryData(postQueryOptions(id)),
+      context.queryClient.ensureInfiniteQueryData(
+        commentsInfiniteQueryOptions({ postId: id, sortBy, order })
+      ),
+    ]);
+  },
 });
 
 function RouteComponent() {
@@ -114,7 +132,7 @@ function RouteComponent() {
         )}
         {user && (
           <Card className="mb-4 py-4">
-            <CardContent>
+            <CardContent className="px-3">
               <CommentForm id={postId} />
             </CardContent>
           </Card>

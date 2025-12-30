@@ -25,15 +25,16 @@ function ProtectedRoute() {
       <div className="mx-auto mt-24 max-w-md text-center space-y-4 px-4">
         <h2 className="text-2xl font-semibold">You’re not signed in</h2>
         <p className="text-sm text-muted-foreground">
-          Sign in to create a post and join the discussion.
+          Sign in to share your thoughts and take part in the discussion
         </p>
         <Button
           onClick={() =>
             navigate({
               to: "/auth/login",
-              search: { redirect: "/create-post" },
+              search: { redirect: "/submit" },
             })
           }
+          className="cursor-pointer"
         >
           Sign in
         </Button>

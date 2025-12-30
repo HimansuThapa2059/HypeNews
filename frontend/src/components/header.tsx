@@ -44,10 +44,11 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 bg-primary backdrop-blur supports-backdrop-filter:bg-primary/90">
-      <div className="max-container flex items-center justify-between p-2.5 sm:p-4 md:px-6">
+      <div className="max-container flex items-center justify-between py-2.5 px-4 sm:p-4 md:px-6">
         <div className="flex items-center space-x-4">
           <Link
             to="/"
+            aria-label="HypeNews Home"
             search={defaultHomeSearchParams}
             className="text-xl sm:text-2xl font-bold flex items-center gap-x-1"
           >
@@ -58,24 +59,38 @@ const Header = () => {
           <nav className="hidden items-center space-x-4 md:flex ml-5 tracking-wide font-medium">
             <Link
               to={"/"}
-              search={defaultHomeSearchParams}
+              search={{ order: "desc", sortBy: "recent", author: "", site: "" }}
               className="hover:underline"
             >
               new
             </Link>
             <Link
               to={"/"}
-              search={defaultHomeSearchParams}
+              search={{ order: "desc", sortBy: "points", author: "", site: "" }}
               className="hover:underline"
             >
               top
             </Link>
             <Link
-              to="/"
-              search={defaultHomeSearchParams}
-              className="hover:underline"
+              to={"/"}
+              search={{ order: "desc", sortBy: "points", author: "", site: "" }}
+              className="hover:underline cursor-not-allowed"
             >
-              submit
+              show
+            </Link>
+            <Link
+              to={"/"}
+              search={{ order: "desc", sortBy: "points", author: "", site: "" }}
+              className="hover:underline cursor-not-allowed"
+            >
+              ask
+            </Link>
+            <Link
+              to={"/"}
+              search={{ order: "desc", sortBy: "points", author: "", site: "" }}
+              className="hover:underline cursor-not-allowed"
+            >
+              job
             </Link>
           </nav>
         </div>
@@ -124,11 +139,13 @@ const Header = () => {
             <Button
               variant="secondary"
               size="icon"
+              aria-label="Open navigation menu"
               className="md:hidden cursor-pointer"
             >
               <MenuIcon className="size-5 sm:size-6" />
             </Button>
           </SheetTrigger>
+
           <SheetContent className="w-64 py-6 px-4 bg-white dark:bg-gray-900 shadow-xl">
             <SheetHeader>
               <SheetTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -145,10 +162,10 @@ const Header = () => {
               <Link
                 to="/"
                 search={{
-                  author: "",
-                  site: "",
                   order: "desc",
                   sortBy: "recent",
+                  author: "",
+                  site: "",
                 }}
                 className="px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-800 dark:text-gray-200"
                 onClick={() => setIsOpen(false)}
@@ -158,28 +175,15 @@ const Header = () => {
               <Link
                 to="/"
                 search={{
+                  order: "desc",
+                  sortBy: "points",
                   author: "",
                   site: "",
-                  order: "desc",
-                  sortBy: "recent",
                 }}
                 className="px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-800 dark:text-gray-200"
                 onClick={() => setIsOpen(false)}
               >
                 Top
-              </Link>
-              <Link
-                to="/"
-                search={{
-                  author: "",
-                  site: "",
-                  order: "desc",
-                  sortBy: "recent",
-                }}
-                className="px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-gray-800 dark:text-gray-200"
-                onClick={() => setIsOpen(false)}
-              >
-                Submit
               </Link>
 
               <div className="mt-4 border-t border-gray-200 dark:border-gray-700"></div>
@@ -188,12 +192,7 @@ const Header = () => {
                 <div className="mt-4 space-y-4">
                   <Link
                     to="/"
-                    search={{
-                      author: "",
-                      site: "",
-                      order: "desc",
-                      sortBy: "recent",
-                    }}
+                    search={defaultHomeSearchParams}
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg"
                   >

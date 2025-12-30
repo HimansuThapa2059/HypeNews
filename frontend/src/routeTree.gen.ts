@@ -16,7 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PostsPostIdRouteImport } from './routes/posts.$postId'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as ProtectedCreatePostRouteImport } from './routes/_protected/create-post'
+import { Route as ProtectedSubmitRouteImport } from './routes/_protected/submit'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -52,9 +52,9 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const ProtectedCreatePostRoute = ProtectedCreatePostRouteImport.update({
-  id: '/create-post',
-  path: '/create-post',
+const ProtectedSubmitRoute = ProtectedSubmitRouteImport.update({
+  id: '/submit',
+  path: '/submit',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
 
@@ -62,7 +62,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/create-post': typeof ProtectedCreatePostRoute
+  '/submit': typeof ProtectedSubmitRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/posts/$postId': typeof PostsPostIdRoute
@@ -71,7 +71,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/create-post': typeof ProtectedCreatePostRoute
+  '/submit': typeof ProtectedSubmitRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/posts/$postId': typeof PostsPostIdRoute
@@ -82,7 +82,7 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/_protected/create-post': typeof ProtectedCreatePostRoute
+  '/_protected/submit': typeof ProtectedSubmitRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/posts/$postId': typeof PostsPostIdRoute
@@ -93,7 +93,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/about'
-    | '/create-post'
+    | '/submit'
     | '/auth/login'
     | '/auth/signup'
     | '/posts/$postId'
@@ -102,7 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/about'
-    | '/create-post'
+    | '/submit'
     | '/auth/login'
     | '/auth/signup'
     | '/posts/$postId'
@@ -112,7 +112,7 @@ export interface FileRouteTypes {
     | '/_protected'
     | '/auth'
     | '/about'
-    | '/_protected/create-post'
+    | '/_protected/submit'
     | '/auth/login'
     | '/auth/signup'
     | '/posts/$postId'
@@ -177,22 +177,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/_protected/create-post': {
-      id: '/_protected/create-post'
-      path: '/create-post'
-      fullPath: '/create-post'
-      preLoaderRoute: typeof ProtectedCreatePostRouteImport
+    '/_protected/submit': {
+      id: '/_protected/submit'
+      path: '/submit'
+      fullPath: '/submit'
+      preLoaderRoute: typeof ProtectedSubmitRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
   }
 }
 
 interface ProtectedRouteRouteChildren {
-  ProtectedCreatePostRoute: typeof ProtectedCreatePostRoute
+  ProtectedSubmitRoute: typeof ProtectedSubmitRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
-  ProtectedCreatePostRoute: ProtectedCreatePostRoute,
+  ProtectedSubmitRoute: ProtectedSubmitRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

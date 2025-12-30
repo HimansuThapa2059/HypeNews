@@ -1,15 +1,39 @@
+import React from "react";
 import {
   Outlet,
-  createRootRoute,
+  createRootRouteWithContext,
   useRouterState,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Header from "@/components/header";
+import { QueryClient } from "@tanstack/react-query";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
 });
+
+interface RouterContext {
+  queryClient: QueryClient;
+}
+
+export const DevTools =
+  process.env.NODE_ENV === "production"
+    ? () => null
+    : React.lazy(() =>
+        Promise.all([
+          import("@tanstack/react-router-devtools"),
+          import("@tanstack/react-query-devtools"),
+        ]).then(([router, query]) => ({
+          default: () => (
+            <>
+              <router.TanStackRouterDevtools position="bottom-left" />
+              <query.ReactQueryDevtools
+                position="top"
+                buttonPosition="bottom-left"
+              />
+            </>
+          ),
+        }))
+      );
 
 function RootComponent() {
   const { location } = useRouterState();
@@ -22,7 +46,7 @@ function RootComponent() {
         {!isAuthPage && <Header />}
 
         <main
-          className={`max-container grow p-4 md:px-6${
+          className={`max-container grow p-4 md:px-6 ${
             isAuthPage ? "flex items-center justify-center" : ""
           }`}
         >
@@ -47,8 +71,7 @@ function RootComponent() {
         )}
       </div>
 
-      <ReactQueryDevtools position="right" />
-      <TanStackRouterDevtools position="bottom-left" />
+      <DevTools />
     </>
   );
 }

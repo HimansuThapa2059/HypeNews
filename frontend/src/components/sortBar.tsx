@@ -30,7 +30,10 @@ export function SortBar({ sortBy, order }: { sortBy: SortBy; order: Order }) {
           })
         }
       >
-        <SelectTrigger className="w-[180px] bg-background cursor-pointer">
+        <SelectTrigger
+          aria-label="Select sort order"
+          className="w-[180px] bg-background cursor-pointer"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

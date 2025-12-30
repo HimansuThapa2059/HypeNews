@@ -22,8 +22,9 @@ import {
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { defaultPostSearchParams } from "../posts.$postId";
+import { Textarea } from "@/components/ui/textarea";
 
-export const Route = createFileRoute("/_protected/create-post")({
+export const Route = createFileRoute("/_protected/submit")({
   component: RouteComponent,
 });
 
@@ -74,10 +75,10 @@ function RouteComponent() {
     <div className="mx-auto w-full max-w-2xl sm:mt-8 md:mt-12">
       <Card>
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl">Create Post</CardTitle>
+          <CardTitle className="text-2xl">Submit Yours</CardTitle>
           <CardDescription>
             Got something to share? Add a title, then choose either a link or
-            some content below. At least one is required to publish.
+            some content below. At least one is required to submit.
           </CardDescription>
         </CardHeader>
 
@@ -147,7 +148,7 @@ function RouteComponent() {
                 return (
                   <div className="space-y-2" data-invalid={isInvalid}>
                     <Label htmlFor={field.name}>Content</Label>
-                    <textarea
+                    <Textarea
                       id={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -178,7 +179,7 @@ function RouteComponent() {
                   {isSubmitting ? (
                     <Loader2 className="mx-auto h-4 w-4 animate-spin" />
                   ) : (
-                    "Post"
+                    "Submit"
                   )}
                 </Button>
               )}
