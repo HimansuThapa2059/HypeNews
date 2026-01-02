@@ -146,7 +146,7 @@ function Login() {
                 variant="outline"
                 className="flex items-center gap-3 w-full cursor-pointer"
                 onClick={() => {
-                  console.log("Google login initiated");
+                  authClient.signIn.social({ provider: "google" });
                 }}
               >
                 <Google className="w-5 h-5" /> Google
@@ -156,7 +156,7 @@ function Login() {
                 variant="outline"
                 className="flex items-center gap-3 w-full cursor-pointer"
                 onClick={() => {
-                  console.log("GitHub login initiated");
+                  authClient.signIn.social({ provider: "github" });
                 }}
               >
                 <GitHub className="w-5 h-5" /> GitHub

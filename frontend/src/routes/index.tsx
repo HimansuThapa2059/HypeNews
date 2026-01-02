@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useUpvotePost } from "@/lib/api-hooks";
 import { useSession } from "@/lib/auth";
 import { SubmitFab } from "@/components/floatingCreateButton";
+import EmptyPosts from "@/components/empty-posts";
 
 type GetPostsReturnType = Awaited<ReturnType<typeof getPosts>>;
 
@@ -115,6 +116,14 @@ function HomeContent({
     useSuspenseInfiniteQuery(
       postsInfiniteQueryOptions({ sortBy, order, author, site })
     );
+
+  const hasAnyPosts = data.pages.some(
+    (page) => page.data && page.data.length > 0
+  );
+
+  if (!hasAnyPosts) {
+    return <EmptyPosts />;
+  }
 
   return (
     <>

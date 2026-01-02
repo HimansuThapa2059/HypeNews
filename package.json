@@ -2,16 +2,19 @@
   "name": "hypenews",
   "scripts": {
     "dev": "bun run --hot server/index.ts",
+    "start": "bun server/index.ts",
     "format:write": "prettier . --write",
     "format:check": "prettier . --check",
     "db:generate-migration": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "lint:server": "cd server && eslint .",
     "lint:frontend": "cd frontend && eslint ."
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.5",
+    "@neondatabase/serverless": "^1.0.2",
     "better-auth": "^1.4.5",
     "drizzle-orm": "^0.45.0",
     "drizzle-zod": "^0.8.3",
@@ -31,7 +34,7 @@
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.1",
     "eslint-plugin-drizzle": "^0.2.3",
-    "globals": "^16.5.0",
+    "globals": "17",
     "jiti": "^2.6.1",
     "prettier": "^3.7.4",
     "typescript-eslint": "^8.48.1"

@@ -79,8 +79,8 @@ export const PostCard = ({
 
             {post.url && (
               <Link
-                to="/"
-                search={{ ...defaultHomeSearchParams, site: post.url }}
+                to={post.url}
+                target="_blank"
                 className={cn(
                   badgeVariants({ variant: "secondary" }),
                   "cursor-pointer text-xs font-normal hover:bg-primary/80 hover:underline"
